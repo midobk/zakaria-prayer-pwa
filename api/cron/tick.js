@@ -33,7 +33,7 @@ function loadPrayerData() {
   if (PRAYER_DATA) return PRAYER_DATA;
   try {
     // api/data.json is committed to the repo (small subset, server-side only).
-    const p = path.join(__dirname, 'data.json');
+    const p = path.join(__dirname, '..', '..', 'data.json');
     PRAYER_DATA = JSON.parse(fs.readFileSync(p, 'utf8'));
   } catch (e) {
     PRAYER_DATA = [];
