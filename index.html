@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a3d2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Zakaria" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <title>Masjid Zakaria — Prayer Times</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #052e22;
+      --bg-1: #0a3d2e;
+      --bg-2: #0f5040;
+      --gold: #d4af6a;
+      --gold-bright: #f0d28a;
+      --gold-soft: rgba(212, 175, 106, 0.18);
+      --ink: #f4ecd8;
+      --ink-soft: rgba(244, 236, 216, 0.75);
+      --ink-dim: rgba(244, 236, 216, 0.55);
+      --card: rgba(255, 255, 255, 0.06);
+      --card-strong: rgba(255, 255, 255, 0.10);
+      --border: rgba(212, 175, 106, 0.22);
+      --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg-0);
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body {
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(212, 175, 106, 0.18), transparent 60%),
+        radial-gradient(900px 500px at 100% 110%, rgba(15, 80, 64, 0.5), transparent 55%),
+        linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 35%, var(--bg-2) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 18px 40px;
+      position: relative;
+    }
+
+    /* Subtle animated background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(212, 175, 106, 0.05) 0, transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(212, 175, 106, 0.04) 0, transparent 35%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .app > * { position: relative; z-index: 1; }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0 6px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold) 0%, #a8854a 100%);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 20px -8px rgba(212, 175, 106, 0.6);
+      flex-shrink: 0;
+    }
+    .logo svg { width: 26px; height: 26px; }
+    .brand-text { line-height: 1.15; }
+    .brand-text h1 {
+      font-family: 'Amiri', serif;
+      font-size: 19px;
+      margin: 0;
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .brand-text p {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: var(--ink-dim);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .install-btn {
+      background: var(--gold-soft);
+      border: 1px solid var(--border);
+      color: var(--gold-bright);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .install-btn:active { transform: scale(0.96); }
+
+    /* HERO COUNTDOWN */
+    .hero {
+      margin-top: 14px;
+      padding: 28px 22px 22px;
+      border-radius: 28px;
+      background: linear-gradient(160deg, rgba(212, 175, 106, 0.12) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(212, 175, 106, 0.06) 100%);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -10%;
+      right: -10%;
+      height: 200%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 106, 0.12), transparent 50%);
+      pointer-events: none;
+    }
+    .hero-label {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold-bright);
+      font-weight: 600;
+    }
+    .hero-name {
+      text-align: center;
+      font-family: 'Amiri', serif;
+      font-size: 36px;
+      margin: 6px 0 14px;
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .hero-time {
+      text-align: center;
+      font-size: 64px;
+      font-weight: 300;
+      letter-spacing: -1.5px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .hero-countdown {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+    .hero-countdown strong {
+      color: var(--gold-bright);
+      font-weight: 600;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pill:active { transform: scale(0.97); }
+    .pill.gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #b89348 100%);
+      color: #1a1208;
+      font-weight: 600;
+      border-color: transparent;
+    }
+    .pill svg { width: 16px; height: 16px; }
+    .pill .check { display: none; }
+    .pill.active .check { display: inline; }
+
+    /* DATE STRIP */
+    .date-strip {
+      margin: 18px 0 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+    .date-strip .hijri {
+      font-family: 'Amiri', serif;
+      font-size: 16px;
+      color: var(--gold-bright);
+    }
+    .date-strip .greg {
+      font-size: 12px;
+      color: var(--ink-dim);
+      letter-spacing: 0.4px;
+    }
+
+    /* PRAYER CARDS */
+    .prayers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .prayer {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 16px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.2s ease;
+    }
+    .prayer.next {
+      background: linear-gradient(120deg, rgba(212, 175, 106, 0.18) 0%, rgba(212, 175, 106, 0.06) 100%);
+      border-color: var(--border);
+      box-shadow: 0 0 0 1px rgba(212, 175, 106, 0.18) inset;
+    }
+    .prayer.passed { opacity: 0.55; }
+
+    .prayer-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+    }
+    .prayer.next .prayer-icon {
+      background: linear-gradient(135deg, var(--gold) 0%, #a8854a 100%);
+    }
+    .prayer-icon svg { width: 24px; height: 24px; }
+    .prayer.next .prayer-icon svg { stroke: #1a1208; }
+
+    .prayer-info { line-height: 1.2; }
+    .prayer-name {
+      font-family: 'Amiri', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .prayer-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin-top: 2px;
+      direction: rtl;
+    }
+    .prayer-time {
+      font-size: 22px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+    }
+    .prayer.next .prayer-time { color: var(--gold-bright); font-weight: 600; }
+    .prayer-meta {
+      font-size: 10px;
+      color: var(--ink-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    /* QIBLA SECTION */
+    .extras {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .extra {
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      text-align: center;
+    }
+    .extra-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+    .extra-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+    .qibla {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin: 6px auto 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: grid;
+      place-items: center;
+    }
+    .qibla-needle {
+      position: absolute;
+      width: 2px;
+      height: 36px;
+      top: 12px;
+      left: 50%;
+      transform-origin: 50% 100%;
+      transform: translateX(-50%) rotate(0deg);
+      transition: transform 0.4s ease;
+    }
+    .qibla-needle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 14px solid var(--gold);
+    }
+
+    /* BOTTOM SHEET / SETTINGS */
+    .settings-toggle {
+      margin: 24px auto 0;
+      display: block;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gold-bright);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+    }
+
+    .settings {
+      margin-top: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      display: none;
+    }
+    .settings.open { display: block; }
+    .settings h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      letter-spacing: 0.4px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .settings .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .settings .row:last-child { border-bottom: none; }
+    .settings .row .label { font-size: 14px; color: var(--ink); }
+    .settings .row .sub { font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--ink);
+      transition: all 0.2s ease;
+    }
+    .toggle.on {
+      background: linear-gradient(135deg, var(--gold) 0%, #b89348 100%);
+      border-color: transparent;
+    }
+    .toggle.on::after {
+      left: 22px;
+      background: #1a1208;
+    }
+
+    .select {
+      background: rgba(0,0,0,0.25);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
+    footer a { color: var(--gold-bright); text-decoration: none; }
+    footer .bismillah {
+      font-family: 'Amiri', serif;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: linear-gradient(135deg, var(--gold) 0%, #b89348 100%);
+      color: #1a1208;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Permission modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px 22px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .modal .m-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 12px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--gold) 0%, #a8854a 100%);
+      display: grid;
+      place-items: center;
+    }
+    .modal .m-icon svg { width: 28px; height: 28px; }
+    .modal h2 {
+      font-family: 'Amiri', serif;
+      font-size: 22px;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+    .modal p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0 0 18px;
+    }
+    .modal .m-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .modal button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .modal .m-primary {
+      background: linear-gradient(135deg, var(--gold) 0%, #b89348 100%);
+      color: #1a1208;
+    }
+    .modal .m-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink-soft);
+    }
+
+    @media (max-width: 360px) {
+      .hero-time { font-size: 54px; }
+      .hero-name { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">
+          <!-- Crescent + mosque dome -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1a1208" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 3a6 6 0 0 1-8 8 7 7 0 1 0 8-8z" fill="#1a1208"/>
+            <path d="M3 21h18"/>
+            <path d="M5 21V14a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v7"/>
+            <path d="M12 10v11"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Masjid Zakaria</h1>
+          <p>Al-Rashid Islamic Institute</p>
+        </div>
+      </div>
+      <button class="install-btn" id="installBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        Install
+      </button>
+    </header>
+
+    <section class="hero" id="hero">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-name" id="heroName">Fajr</div>
+      <div class="hero-time" id="heroTime">—</div>
+      <div class="hero-countdown" id="heroCountdown">in —</div>
+      <div class="hero-actions">
+        <button class="pill gold" id="notifyBtn">
+          <span class="bell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          </span>
+          <span class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="label">Enable Alerts</span>
+        </button>
+        <button class="pill" id="qiblaBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          Qibla
+        </button>
+      </div>
+    </section>
+
+    <div class="date-strip">
+      <div class="hijri" id="hijriDate">—</div>
+      <div class="greg" id="gregDate">—</div>
+    </div>
+
+    <div class="prayers" id="prayers">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="extras">
+      <div class="extra">
+        <div class="extra-label">Qibla Direction</div>
+        <div class="qibla">
+          <div class="qibla-needle" id="qiblaNeedle"></div>
+        </div>
+        <div class="extra-value" id="qiblaValue">—</div>
+      </div>
+      <div class="extra">
+        <div class="extra-label">Today's Hijri</div>
+        <div class="extra-value" id="hijriFull">—</div>
+      </div>
+    </div>
+
+    <button class="settings-toggle" id="settingsToggle">⚙ Notification settings</button>
+    <div class="settings" id="settings">
+      <h3>Notify me before</h3>
+      <div class="row">
+        <div>
+          <div class="label">Fajr</div>
+        </div>
+        <select class="select" data-prayer="fajr">
+          <option value="0">At time</option>
+          <option value="10">10 min before</option>
+          <option value="15">15 min before</option>
+          <option value="20">20 min before</option>
+          <option value="30">30 min before</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Zuhr</div>
+        <select class="select" data-prayer="zuhr">
+          <option value="0">At time</option>
+          <option value="10">10 min before</option>
+          <option value="15">15 min before</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Asr</div>
+        <select class="select" data-prayer="asr1">
+          <option value="0">At time</option>
+          <option value="10">10 min before</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Maghrib</div>
+        <select class="select" data-prayer="maghrib">
+          <option value="0">At time</option>
+          <option value="10">10 min before</option>
+          <option value="15">15 min before</option>
+          <option value="30">30 min before</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Isha</div>
+        <select class="select" data-prayer="isha">
+          <option value="0">At time</option>
+          <option value="10">10 min before</option>
+          <option value="15">15 min before</option>
+        </select>
+      </div>
+      <h3 style="margin-top: 14px;">Test</h3>
+      <div class="row">
+        <div>
+          <div class="label">Send a test notification</div>
+          <div class="sub">Make sure alerts are working</div>
+        </div>
+        <button class="pill" id="testBtn" style="flex: 0 0 auto; padding: 8px 14px; font-size: 12px;">Send</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="bismillah">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+      Cornwall, Ontario · 45.018°N, 74.728°W<br>
+      Maghrib/Isha per mosque printed timetable · Other times via Aladhan (ISNA)<br>
+      <a href="https://github.com/midobk" target="_blank" rel="noopener">Built for the community</a>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="m-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1a1208" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </div>
+      <h2>Prayer time alerts</h2>
+      <p>Get a gentle notification before each prayer. You can pick which prayers and how early in settings.</p>
+      <div class="m-actions">
+        <button class="m-secondary" id="modalClose">Not now</button>
+        <button class="m-primary" id="modalAllow">Enable</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">—</div>
+
+  <script src="./prayer-data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
