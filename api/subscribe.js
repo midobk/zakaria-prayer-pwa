@@ -1,6 +1,6 @@
 // POST /api/subscribe
 // Body: { subscription: { endpoint, keys:{p256dh,auth} }, offsets: {fajr:0,zuhr:10,...} }
-// Stores the subscription and per-prayer offsets in Edge Config.
+// Stores the subscription and per-prayer offsets in Upstash Redis.
 
 const { respond, ecGet, ecSet, ecDel, endpointHash } = require('./_lib');
 

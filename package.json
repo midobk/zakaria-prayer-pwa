@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/midobk/zakaria-prayer-pwa#readme",
   "dependencies": {
-    "@vercel/edge-config": "^1.4.3",
     "web-push": "^3.6.7"
   }
 }

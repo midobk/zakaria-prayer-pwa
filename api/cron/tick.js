@@ -1,15 +1,14 @@
-// POST /api/cron/tick
-// Heart of the system. Called by Vercel Cron (every 10 min on Hobby) OR by an external
+// Heart of the system. Called by Vercel Cron (1/day on Hobby) OR by an external
 // cron-job.org ping OR by the in-SW Background Sync pinger. Walks all subs, checks each
 // one's offsets against today's times, sends web-push notifications for any matching slot
-// that hasn't fired yet today. Dedupes via fired:* keys in Edge Config.
+// that hasn't fired yet today. Dedupes via fired:* keys in Upstash.
 
 const webpush = require('web-push');
 const fs = require('fs');
 const path = require('path');
 const {
-  EC_BASE, EC_TOKEN, PRAYER_KEYS, PRAYER_LABEL,
-  ecGet, ecGetAll, ecSet, todayLocal, nowMinutesInToronto,
+  ecGet, ecSet, ecScan, PRAYER_KEYS, PRAYER_LABEL,
+  todayLocal, nowMinutesInToronto,
   timeToMinutes, format12FromMinutes, respond,
 } = require('../_lib');
 
@@ -27,12 +26,11 @@ function getWebpush() {
   return wp;
 }
 
-// Load prayer-data from repo. On Vercel this path resolves at the function root.
+// Load prayer-data from repo. On Vercel this path resolves to the project root.
 let PRAYER_DATA = null;
 function loadPrayerData() {
   if (PRAYER_DATA) return PRAYER_DATA;
   try {
-    // api/data.json is committed to the repo (small subset, server-side only).
     const p = path.join(__dirname, '..', '..', 'data.json');
     PRAYER_DATA = JSON.parse(fs.readFileSync(p, 'utf8'));
   } catch (e) {
@@ -48,21 +46,14 @@ function findToday() {
 }
 
 async function listAllSubs() {
-  // Edge Config: GET /items?token=... returns the whole config as a flat object.
-  const res = await fetch(`${EC_BASE}/items?token=${EC_TOKEN}`);
-  if (!res.ok) throw new Error(`EC list failed: ${res.status}`);
-  const all = await res.json();
-  const subs = {};
-  for (const [k, v] of Object.entries(all)) {
-    if (k.startsWith('subs:')) subs[k.slice(5)] = v;
-  }
-  return subs;
+  const all = await ecScan('subs:*');
+  return all;
 }
 
 async function wasFiredToday(subId, prayer, off) {
   const key = `fired:${subId}:${todayLocal()}:${prayer}:${off}`;
   const v = await ecGet(key);
-  return v === 1;
+  return v === 1 || v === '1';
 }
 
 async function markFiredToday(subId, prayer, off) {
@@ -96,7 +87,9 @@ module.exports = async (req, res) => {
 
   const summary = { date: today, nowMin, subs: Object.keys(subs).length, fired: [], errors: [] };
 
-  for (const [id, sub] of Object.entries(subs)) {
+  for (const [key, sub] of Object.entries(subs)) {
+    if (!key.startsWith('subs:')) continue;
+    const id = key.slice(5);
     if (!sub?.endpoint || !sub?.keys?.p256dh || !sub?.keys?.auth) continue;
     const offsets = sub.offsets || {};
 
@@ -134,7 +127,6 @@ module.exports = async (req, res) => {
         await markFiredToday(id, prayer, off);
         summary.fired.push({ id, prayer, off });
       } catch (e) {
-        // 404/410 — endpoint is gone, delete the sub
         if (e.statusCode === 404 || e.statusCode === 410) {
           try { await ecDel(`subs:${id}`); } catch {}
         }

@@ -2,7 +2,6 @@
 // Sends a single test push to a subscription. Used by the app's "Test" button.
 // Body: { subscription: { endpoint, keys } }
 
-const webpush = require('web-push');
 const { respond } = require('./_lib');
 
 let wp = null;

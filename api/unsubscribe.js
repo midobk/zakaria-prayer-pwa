@@ -1,7 +1,7 @@
 // POST /api/unsubscribe
 // Body: { endpoint } — removes the subscription.
 
-const { respond, ecDel, ecGet, endpointHash } = require('./_lib');
+const { respond, ecDel, endpointHash } = require('./_lib');
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return respond(res, 200, { ok: true });
