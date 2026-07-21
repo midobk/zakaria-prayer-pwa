@@ -1,0 +1,24 @@
+{
+  "name": "zakaria-pwa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/midobk/zakaria-prayer-pwa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/midobk/zakaria-prayer-pwa/issues"
+  },
+  "homepage": "https://github.com/midobk/zakaria-prayer-pwa#readme",
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

@@ -1,5 +1,7 @@
 // Service worker for Masjid Zakaria PWA
-const CACHE = 'zakaria-v1';
+// Real Web Push handler (subscription + push events from the server).
+
+const CACHE = 'zakaria-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +9,7 @@ const ASSETS = [
   './app.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
@@ -40,30 +42,54 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-// Handle notification click — focus/open the app
+// Real push event from server (via web-push)
+self.addEventListener('push', (e) => {
+  let data = { title: '🕌 Masjid Zakaria', body: 'Prayer time', url: '/', tag: 'zakaria', icon: '/icons/icon-192.png' };
+  try { if (e.data) data = { ...data, ...e.data.json() }; } catch {}
+
+  const options = {
+    body: data.body,
+    tag: data.tag || 'zakaria',
+    icon: data.icon || '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    vibrate: [200, 100, 200, 100, 200],
+    requireInteraction: false,
+    renotify: true,
+    data: { url: data.url || '/' },
+    actions: [
+      { action: 'open', title: 'Open app' },
+      { action: 'dismiss', title: 'Dismiss' },
+    ],
+  };
+
+  e.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
+  if (e.action === 'dismiss') return;
+  const url = e.notification.data?.url || '/';
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((wins) => {
       for (const w of wins) {
         if (w.url.endsWith('/') && 'focus' in w) return w.focus();
       }
-      if (self.clients.openWindow) return self.clients.openWindow('/');
+      if (self.clients.openWindow) return self.clients.openWindow(url);
     })
   );
 });
 
-// Allow the page to trigger a notification from the SW (for richer scheduling)
+// Allow the page to trigger a local notification (still works as a fallback)
 self.addEventListener('message', (e) => {
   if (e.data && e.data.type === 'show-notification') {
-    const { title, body, tag, icon } = e.data;
-    self.registration.showNotification(title, {
-      body,
-      tag: tag || 'zakaria',
-      icon: icon || '/icons/icon-192.png',
+    const { title, body, tag } = e.data;
+    self.registration.showNotification(title || '🕌 Masjid Zakaria', {
+      body, tag: tag || 'zakaria-local',
+      icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
       vibrate: [200, 100, 200],
-      requireInteraction: false
     });
   }
 });
