@@ -8,10 +8,12 @@ const webpush = require('web-push');
 const fs = require('fs');
 const path = require('path');
 const {
-  EC_BASE, EC_TOKEN, CRON_SECRET, PRAYER_KEYS, PRAYER_LABEL,
+  EC_BASE, EC_TOKEN, PRAYER_KEYS, PRAYER_LABEL,
   ecGet, ecSet, todayLocal, nowMinutesInToronto,
   timeToMinutes, format12FromMinutes, respond,
 } = require('../_lib');
+
+const CRON_SECRET = process.env.CRON_SECRET || '';
 
 let wp = null;
 function getWebpush() {
