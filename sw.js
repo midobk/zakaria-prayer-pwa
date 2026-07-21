@@ -1,7 +1,7 @@
 // Service worker for Masjid Zakaria PWA
 // Real Web Push handler (subscription + push events from the server).
 
-const CACHE = 'zakaria-v3';
+const CACHE = 'zakaria-v4';
 const ASSETS = [
   './',
   './index.html',
