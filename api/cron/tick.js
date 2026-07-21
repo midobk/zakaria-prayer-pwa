@@ -67,7 +67,7 @@ async function wasFiredToday(subId, prayer, off) {
 
 async function markFiredToday(subId, prayer, off) {
   const key = `fired:${subId}:${todayLocal()}:${prayer}:${off}`;
-  await ecSet(`fired:${id}:${todayLocal()}:${prayer}:${off}`, 1);
+  await ecSet(key, 1);
 }
 
 module.exports = async (req, res) => {
