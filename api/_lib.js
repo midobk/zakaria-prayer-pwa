@@ -5,10 +5,17 @@
 
 const EC_ID = process.env.EDGE_CONFIG || 'ecfg_svzbvpplfllkxbw6egr43ku0bw8n';
 const EC_TOKEN = process.env.EDGE_CONFIG_TOKEN || 'defb6105-e494-4f51-9c18-8f0a4bbd9933';
-const EC_BASE = `https://edge-config.vercel.com/v1/${EC_ID}`;
+// Real Edge Config REST API base URL (no /v1/ prefix — the SDK uses /ecfg_xxx/items?token=...)
+const EC_BASE = `https://edge-config.vercel.com/${EC_ID}`;
 
 const PRAYER_KEYS = ['fajr', 'zuhr', 'asr1', 'maghrib', 'isha'];
 const PRAYER_LABEL = { fajr: 'Fajr', zuhr: 'Zuhr', asr1: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
+
+async function ecGetAll() {
+  const res = await fetch(`${EC_BASE}/items?token=${EC_TOKEN}`);
+  if (!res.ok) throw new Error(`EC getAll failed: ${res.status}`);
+  return res.json();
+}
 
 async function ecGet(key) {
   const url = `${EC_BASE}/item/${encodeURIComponent(key)}?token=${EC_TOKEN}`;
@@ -18,16 +25,14 @@ async function ecGet(key) {
   return res.json();
 }
 
-async function ecSet(items) {
-  const body = Array.isArray(items)
-    ? items.map((i) => ({ key: i.key, value: i.value, operation: i.operation || 'upsert' }))
-    : [{ key: items.key, value: items.value, operation: items.operation || 'upsert' }];
-  const res = await fetch(`${EC_BASE}/items?token=${EC_TOKEN}`, {
-    method: 'PATCH',
+async function ecSet(key, value) {
+  // Edge Config write: single PUT/POST with { key, value }
+  const res = await fetch(`${EC_BASE}/item?token=${EC_TOKEN}`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ key, value }),
   });
-  if (!res.ok) throw new Error(`EC set failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`EC set ${key} failed: ${res.status} ${await res.text()}`);
   return res.json();
 }
 
@@ -92,7 +97,7 @@ function respond(res, status, body, extraHeaders = {}) {
 module.exports = {
   EC_ID, EC_TOKEN, EC_BASE,
   PRAYER_KEYS, PRAYER_LABEL,
-  ecGet, ecSet, ecDel,
+  ecGet, ecGetAll, ecSet, ecDel,
   endpointHash, todayLocal, nowMinutesInToronto,
   timeToMinutes, format12FromMinutes,
   respond,

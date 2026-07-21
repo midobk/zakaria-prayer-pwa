@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
   };
 
   try {
-    await ecSet({ key: `subs:${id}`, value: record, operation: 'upsert' });
+    await ecSet(`subs:${id}`, record);
     return respond(res, 200, { ok: true, id });
   } catch (e) {
     return respond(res, 500, { error: String(e.message || e) });

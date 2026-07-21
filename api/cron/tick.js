@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   EC_BASE, EC_TOKEN, PRAYER_KEYS, PRAYER_LABEL,
-  ecGet, ecSet, todayLocal, nowMinutesInToronto,
+  ecGet, ecGetAll, ecSet, todayLocal, nowMinutesInToronto,
   timeToMinutes, format12FromMinutes, respond,
 } = require('../_lib');
 
@@ -67,7 +67,7 @@ async function wasFiredToday(subId, prayer, off) {
 
 async function markFiredToday(subId, prayer, off) {
   const key = `fired:${subId}:${todayLocal()}:${prayer}:${off}`;
-  await ecSet({ key, value: 1, operation: 'create' });
+  await ecSet(`fired:${id}:${todayLocal()}:${prayer}:${off}`, 1);
 }
 
 module.exports = async (req, res) => {
