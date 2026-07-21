@@ -11,7 +11,7 @@ const {
   EC_BASE, EC_TOKEN, CRON_SECRET, PRAYER_KEYS, PRAYER_LABEL,
   ecGet, ecSet, todayLocal, nowMinutesInToronto,
   timeToMinutes, format12FromMinutes, respond,
-} = require('./_lib');
+} = require('../_lib');
 
 let wp = null;
 function getWebpush() {
