@@ -13,11 +13,17 @@ const {
   timeToMinutes, format12FromMinutes, respond,
 } = require('./_lib');
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT || 'mailto:mehdi.bakkalimaassom@gmail.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+let wp = null;
+function getWebpush() {
+  if (wp) return wp;
+  wp = require('web-push');
+  wp.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:mehdi.bakkalimaassom@gmail.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+  return wp;
+}
 
 // Load prayer-data from repo. On Vercel this path resolves at the function root.
 let PRAYER_DATA = null;
@@ -118,7 +124,7 @@ module.exports = async (req, res) => {
       });
 
       try {
-        await webpush.sendNotification(
+        await getWebpush().sendNotification(
           { endpoint: sub.endpoint, keys: sub.keys },
           payload,
           { TTL: 60 * 60, urgency: 'high' }
